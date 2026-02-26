@@ -7,7 +7,7 @@ USER_DB = os.path.join(os.path.dirname(__file__), "users.json")
 
 def login_form():
     st.markdown("<div class='login-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='login-header'>🔒 Login to WorkSight</div>", unsafe_allow_html=True)
+    st.markdown("<div class='login-header'>🔒 Login to WorkplaceAI</div>", unsafe_allow_html=True)
 
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
