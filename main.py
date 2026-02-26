@@ -32,8 +32,8 @@ except FileNotFoundError:
 st.markdown("""
 <div class='custom-header'>
   <div class='header-left'>
-    <div class='brand-name'>WorkSight</div>
-    <div class='brand-tagline'>Built for leaders. Powered by insight</div>
+    <div class='brand-name'>WorkplaceAI</div>
+    <div class='brand-tagline'>AI-native people intelligence for world-class teams</div>
   </div>
   <div class='header-right'>
     <a href="https://yourhelp.site" target="_blank">Help</a>

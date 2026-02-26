@@ -1,156 +1,185 @@
-/* Sidebar Base */
-section[data-testid="stSidebar"] {
-    background-color: #142A4F !important;
-    font-family: 'Segoe UI', sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
+
+:root {
+    --bg-main: #070b1a;
+    --bg-panel: rgba(14, 21, 45, 0.78);
+    --brand-primary: #6d4dff;
+    --brand-secondary: #15d4ff;
+    --brand-accent: #ff3cac;
+    --text-primary: #f4f7ff;
+    --text-secondary: #c7d4ff;
+    --surface-border: rgba(255, 255, 255, 0.14);
 }
 
-/* Label and Headers only */
-section[data-testid="stSidebar"] .stMarkdown,
-section[data-testid="stSidebar"] label {
-    color: white !important;
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
 }
 
-/* Dropdown Base Box */
-section[data-testid="stSidebar"] .stSelectbox,
-section[data-testid="stSidebar"] .stMultiSelect {
-    background-color: #142A4F !important;
+.stApp {
+    background:
+        radial-gradient(circle at 8% 12%, rgba(109, 77, 255, 0.35), transparent 34%),
+        radial-gradient(circle at 90% 8%, rgba(21, 212, 255, 0.3), transparent 32%),
+        radial-gradient(circle at 55% 95%, rgba(255, 60, 172, 0.24), transparent 28%),
+        var(--bg-main) !important;
+    color: var(--text-primary) !important;
 }
 
-/* Dropdown Selected Text and Tags */
-section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"],
-section[data-testid="stSidebar"] .stMultiSelect div[data-baseweb="select"],
-section[data-testid="stSidebar"] .stSelectbox span[aria-selected="true"],
-section[data-testid="stSidebar"] .stMultiSelect span[aria-selected="true"] {
-    color: black !important;
-    background-color: white !important;
-}
-
-/* Selected Filter (pill) Style */
-section[data-testid="stSidebar"] .stMultiSelect span[aria-label][data-baseweb="tag"] {
-    background-color: #406080 !important;
-    color: white !important;
-    border: none !important;
-}
-
-/* Remove red border when focused */
-section[data-testid="stSidebar"] .stSelectbox:focus-within,
-section[data-testid="stSidebar"] .stMultiSelect:focus-within {
-    border: 1px solid #ccc !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-/* Main area styling */
 section.main {
-    background-color: #F5F5F5 !important;
-    color: black !important;
+    background: transparent !important;
 }
 
-/* ✅ Expand main content width */
 section.main > div {
     max-width: 100% !important;
     padding-left: 2rem;
     padding-right: 2rem;
 }
 
-/* ✅ Custom header layout */
+.block-container {
+    padding-top: 1.4rem !important;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, rgba(16, 28, 59, 0.96), rgba(12, 18, 40, 0.96)) !important;
+    border-right: 1px solid var(--surface-border);
+    backdrop-filter: blur(8px);
+}
+
+section[data-testid="stSidebar"] .stMarkdown,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] .st-emotion-cache-10trblm,
+section[data-testid="stSidebar"] .st-emotion-cache-16txtl3 {
+    color: var(--text-primary) !important;
+}
+
+section[data-testid="stSidebar"] .stMultiSelect [data-baseweb="select"],
+section[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 12px !important;
+}
+
+section[data-testid="stSidebar"] [data-baseweb="tag"] {
+    background: linear-gradient(90deg, var(--brand-primary), #5fdbff) !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+section[data-testid="stSidebar"] .stButton > button {
+    border-radius: 12px;
+}
+
+/* Header */
 .custom-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #142A4F;
-    padding: 10px 30px 8px 30px;
-    font-family: 'Segoe UI', sans-serif;
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    background: linear-gradient(120deg, rgba(25, 34, 74, 0.92), rgba(48, 25, 86, 0.88));
+    border: 1px solid var(--surface-border);
+    backdrop-filter: blur(14px);
+    border-radius: 18px;
+    padding: 14px 24px;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    box-shadow: 0 14px 32px rgba(2, 5, 20, 0.45);
 }
 
-/* Brand section */
 .custom-header .header-left {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 2px;
 }
 
 .custom-header .brand-name {
-    font-size: 22px;
-    font-weight: bold;
-    color: #00ccffc5;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #ffffff, #95f6ff 45%, #dda7ff 90%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.3px;
 }
 
 .custom-header .brand-tagline {
     font-size: 13px;
-    font-style: italic;
-    color: white;
-    margin-top: 2px;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
-/* Right actions */
 .custom-header .header-right {
     display: flex;
     align-items: center;
-    gap: 20px;
-    font-size: 15px;
-    font-weight: 500;
+    gap: 12px;
 }
 
 .custom-header .header-right a {
-    color: white;
+    color: #ffffff;
     text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.06);
+    transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .custom-header .header-right a:hover {
-    text-decoration: underline;
+    background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+    border-color: transparent;
+    transform: translateY(-1px);
 }
 
-/* Align Logout to match Help styling */
-.custom-header .header-right .header-logout {
-    color: white;
-    text-decoration: none;
+/* Global cards/containers */
+.st-emotion-cache-1r6slb0,
+div[data-testid="stMetric"] {
+    border-radius: 16px !important;
+    border: 1px solid var(--surface-border) !important;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)) !important;
+}
+
+.stDataFrame, div[data-testid="stTable"] {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--surface-border);
+}
+
+/* Login polish */
+.login-card {
+    max-width: 480px;
+    margin: 6rem auto;
+    padding: 2rem;
+    border-radius: 24px;
+    border: 1px solid var(--surface-border);
+    background: linear-gradient(150deg, rgba(20, 31, 63, 0.95), rgba(26, 14, 57, 0.92));
+    box-shadow: 0 20px 45px rgba(3, 5, 18, 0.55);
+}
+
+.login-header {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.55rem;
+    margin-bottom: 1rem;
+    color: #e9f4ff;
+}
+
+.stTextInput > div > div > input {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.stButton > button {
+    background: linear-gradient(95deg, var(--brand-primary), var(--brand-accent));
     border: none;
-    background: none;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0;
+    color: white;
+    font-weight: 700;
+    border-radius: 12px;
+    box-shadow: 0 12px 24px rgba(111, 65, 255, 0.35);
 }
 
-.custom-header .header-right .header-logout:hover {
-    text-decoration: underline;
-}
-
-.header-logout:hover {
-    background-color: white;
-    color: #142A4F;
-}
-
-/* ✅ Custom footer */
 .custom-footer {
-    text-align: center;
-    padding: 12px 10px 5px;
-    background-color: #142A4F;
-    color: white;
-    font-size: 13px;
-    margin-top: 40px;
-    font-family: 'Segoe UI', sans-serif;
-    position: sticky;
-    bottom: 0;
-    z-index: 999;
-}
-/* Align Logout to match Help styling */
-.custom-header .header-right .header-logout {
-    color: white;
-    text-decoration: none;
-    border: none;
-    background: none;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0;
-}
-
-.custom-header .header-right .header-logout:hover {
-    text-decoration: underline;
+    margin-top: 2rem;
+    height: 12px;
 }
