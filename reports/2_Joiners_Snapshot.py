@@ -9,31 +9,22 @@ import base64
 from io import BytesIO
 from theme_handler import selected_theme
 from utils.formatting import format_in_indian_style
+from utils.ui_components import inject_report_stylesheet, render_kpi, render_page_title
 from pandas import ExcelWriter
 
-# === Load Report Style ===
-with open("utils/report_style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-# === KPI Card Formatter ===
-def kpi(label, value):
-    return f"""
-    <div class="kpi-card">
-        <div class="kpi-value">{value}</div>
-        <div class="kpi-label">{label}</div>
-    </div>
-    """
+inject_report_stylesheet()
 
 # === Word Cloud ===
 def generate_wordcloud(data):
     text = ' '.join(data.dropna().astype(str).tolist())
-    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+    wordcloud = WordCloud(width=800, height=400, background_color=None, mode='RGBA', colormap='cool').generate(text)
     buffer = BytesIO()
-    plt.figure(figsize=(6, 3))
+    plt.figure(figsize=(6, 3), facecolor='none')
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
     plt.tight_layout()
-    plt.savefig(buffer, format='png')
+    plt.gca().set_facecolor('none')
+    plt.savefig(buffer, format='png', transparent=True)
     buffer.seek(0)
     img_str = base64.b64encode(buffer.read()).decode()
     plt.close()
@@ -72,18 +63,18 @@ def render(data_frames):
     top_source = df_joiners["hiring_source"].mode()[0] if not df_joiners["hiring_source"].dropna().empty else "N/A"
     top_zone = df_joiners["zone"].mode()[0] if not df_joiners["zone"].dropna().empty else "N/A"
 
-    st.markdown("<h2 style='text-align: left;'>New Joinee Snapshot</h2>", unsafe_allow_html=True)
+    render_page_title("New Joinee Snapshot", "Hiring quality, source mix, and capability intake for the current fiscal year.")
     col1, col2, col3, col4 = st.columns(4)
-    with col1: st.markdown(kpi("Total New Joiners", format_in_indian_style(total_joiners)), unsafe_allow_html=True)
-    with col2: st.markdown(kpi("Average Age", f"{avg_age_joiners:.1f} yrs"), unsafe_allow_html=True)
-    with col3: st.markdown(kpi("Average Experience", f"{avg_experience_joiners:.1f} yrs"), unsafe_allow_html=True)
-    with col4: st.markdown(kpi("Average CTC", f"₹ {avg_ctc_joiners:.1f} L"), unsafe_allow_html=True)
+    with col1: st.markdown(render_kpi("Total New Joiners", format_in_indian_style(total_joiners)), unsafe_allow_html=True)
+    with col2: st.markdown(render_kpi("Average Age", f"{avg_age_joiners:.1f} yrs"), unsafe_allow_html=True)
+    with col3: st.markdown(render_kpi("Average Experience", f"{avg_experience_joiners:.1f} yrs"), unsafe_allow_html=True)
+    with col4: st.markdown(render_kpi("Average CTC", f"₹ {avg_ctc_joiners:.1f} L"), unsafe_allow_html=True)
 
     col5, col6, col7, col8 = st.columns(4)
-    with col5: st.markdown(kpi("Percentage of Freshers", f"{percentage_freshers:.1f}%"), unsafe_allow_html=True)
-    with col6: st.markdown(kpi("Male to Female Ratio", gender_ratio), unsafe_allow_html=True)
-    with col7: st.markdown(kpi("Top Hiring Source", top_source), unsafe_allow_html=True)
-    with col8: st.markdown(kpi("Top Hiring Zone", top_zone), unsafe_allow_html=True)
+    with col5: st.markdown(render_kpi("Percentage of Freshers", f"{percentage_freshers:.1f}%"), unsafe_allow_html=True)
+    with col6: st.markdown(render_kpi("Male to Female Ratio", gender_ratio), unsafe_allow_html=True)
+    with col7: st.markdown(render_kpi("Top Hiring Source", top_source), unsafe_allow_html=True)
+    with col8: st.markdown(render_kpi("Top Hiring Zone", top_zone), unsafe_allow_html=True)
 
     # === Chart Data Prep ===
     hiring_source_summary = df_joiners['hiring_source'].value_counts().reset_index()

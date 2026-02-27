@@ -1,26 +1,27 @@
 def render(data_frames):
-    import streamlit as st
-    import pandas as pd
-    import os
-    from datetime import datetime
-    from PIL import Image, ImageDraw, ImageOps
     import base64
+    import os
+    import time
     from io import BytesIO
 
+    import pandas as pd
+    import streamlit as st
+    from PIL import Image, ImageDraw, ImageOps
+    from utils.ui_components import render_page_title
+
     def is_cloud():
-        # Detect Streamlit Cloud environment
-        return 'appuser' in os.getcwd()
+        return "appuser" in os.getcwd()
 
     def format_inr(val):
         try:
             return f"₹ {round(val / 100000, 2)} Lakhs"
-        except:
+        except Exception:
             return "-"
 
     def format_date(val):
         try:
             return pd.to_datetime(val).strftime("%d-%b-%Y")
-        except:
+        except Exception:
             return "-"
 
     def create_circular_image(path, size=(150, 150)):
@@ -43,34 +44,34 @@ def render(data_frames):
         return ""
 
     def export_html_to_pdf_using_cdp(html_path, pdf_path):
-        import streamlit as st
         if is_cloud():
             st.warning("PDF export is not supported on Streamlit Cloud.")
             return False
-        # ONLY import and use Selenium if running locally!
+
         from selenium import webdriver
         from selenium.webdriver.chrome.options import Options
-        import time
-        import base64
 
         chrome_options = Options()
-        chrome_options.add_argument('--headless=new')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--window-size=1280,1696')
+        chrome_options.add_argument("--headless=new")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--window-size=1280,1696")
 
         driver = webdriver.Chrome(options=chrome_options)
         driver.get("file://" + os.path.abspath(html_path))
         time.sleep(2)
 
-        result = driver.execute_cdp_cmd("Page.printToPDF", {
-            "landscape": False,
-            "printBackground": True,
-            "preferCSSPageSize": True
-        })
+        result = driver.execute_cdp_cmd(
+            "Page.printToPDF",
+            {
+                "landscape": False,
+                "printBackground": True,
+                "preferCSSPageSize": True,
+            },
+        )
 
         with open(pdf_path, "wb") as f:
-            f.write(base64.b64decode(result['data']))
+            f.write(base64.b64decode(result["data"]))
 
         driver.quit()
         return True
@@ -89,15 +90,14 @@ def render(data_frames):
 
     df_active = df[df["date_of_exit"].isna() | (df["date_of_exit"] > today)]
 
-    st.markdown("### 🔍 Talent Profile Summary")
+    render_page_title("Talent Profile", "Unified employee intelligence card aligned with the global UI system.")
     emp_id = st.text_input("Enter Employee ID", key="pdf_input")
-
     if not emp_id:
         return
 
     try:
         emp_id = int(emp_id)
-    except:
+    except Exception:
         st.error("Employee ID must be numeric.")
         return
 
@@ -112,8 +112,7 @@ def render(data_frames):
     age = "-"
     tenure = "-"
     if pd.notna(emp["date_of_birth"]):
-        age = int((today - emp["date_of_birth"]).days / 365.25)
-        age = f"{age} yrs"
+        age = f"{int((today - emp['date_of_birth']).days / 365.25)} yrs"
     if pd.notna(emp["date_of_joining"]):
         delta = today - emp["date_of_joining"]
         years = delta.days // 365
@@ -121,11 +120,9 @@ def render(data_frames):
         tenure = f"{years} yrs {months} months" if years > 0 else f"{months} months"
 
     def section(title, fields):
-        merged_skills = ', '.join(filter(None, [
-            str(emp.get('skills_1', '')).strip(),
-            str(emp.get('skills_2', '')).strip(),
-            str(emp.get('skills_3', '')).strip()
-        ])) or "-"
+        merged_skills = ", ".join(
+            filter(None, [str(emp.get("skills_1", "")).strip(), str(emp.get("skills_2", "")).strip(), str(emp.get("skills_3", "")).strip()])
+        ) or "-"
 
         merged_competency = "-"
         if emp.get("competency_type") or emp.get("competency_level"):
@@ -133,7 +130,7 @@ def render(data_frames):
                 filter(None, [str(emp.get("competency_type", "")).strip(), str(emp.get("competency_level", "")).strip()])
             ) or "-"
 
-        s = f'<div class="section"><h4>{title}</h4>'
+        rows = [f"<div class='talent-section'><h4>{title}</h4>"]
         for label, key in fields:
             val = emp.get(key, "-")
             if key == "merged_skills":
@@ -148,58 +145,40 @@ def render(data_frames):
                 val = f"{val} hrs"
             elif "exp" in key and pd.notna(val) and isinstance(val, (int, float)):
                 val = f"{val} yrs"
-            s += f'<div class="row"><div class="label">{label}</div><div class="value">{val}</div></div>'
-        s += '</div>'
-        return s
+            rows.append(f"<div class='talent-row'><div class='talent-label'>{label}</div><div class='talent-value'>{val}</div></div>")
+        rows.append("</div>")
+        return "".join(rows)
 
     html = f"""
     <html><head><meta charset='utf-8'>
     <style>
-    body {{ font-family: 'Segoe UI', sans-serif; font-size: 13px; margin: 20px; background: #f5f8fc; }}
-    .profile-header {{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #0E2A47;
-        color: white;
-        padding: 20px;
-        border-radius: 12px;
-        margin-top: 20px;
-    }}
-    .profile-info {{
-        flex-grow: 1;
-    }}
-    .profile-info h2 {{
-        margin: 0;
-        font-size: 22px;
-    }}
-    .photo {{
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 3px solid white;
-        object-fit: cover;
-    }}
-    .gridbox {{ display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }}
-    .section {{ padding: 15px 20px; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }}
-    .section h4 {{ margin-bottom: 10px; color: #0E2A47; border-bottom: 1px solid #e0e0e0; padding-bottom: 5px; }}
-    .row {{ display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding: 4px 0; }}
-    .label {{ font-weight: bold; color: #555; }}
-    .value {{ color: #000; }}
+    body {{ font-family: 'Inter', sans-serif; font-size: 13px; margin: 8px; background: transparent; color: #eef3ff; }}
+    .talent-profile-shell {{ font-size: 13px; color: #eff4ff; padding: 8px 2px; }}
+    .talent-header {{ display:flex; align-items:center; justify-content:space-between; gap:16px; background: linear-gradient(120deg, rgba(25, 34, 74, 0.92), rgba(48, 25, 86, 0.88)); border: 1px solid rgba(255,255,255,0.14); border-radius: 16px; padding: 18px; }}
+    .talent-avatar {{ width: 112px; height: 112px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.36); object-fit: cover; }}
+    .talent-grid {{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }}
+    .talent-section {{ background: linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:12px 14px; }}
+    .talent-section h4 {{ margin:0 0 8px; color:#9adfff; font-size:13px; text-transform:uppercase; letter-spacing:0.6px; }}
+    .talent-row {{ display:flex; justify-content:space-between; gap:10px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.08); }}
+    .talent-row:last-child {{ border-bottom:none; }}
+    .talent-label {{ color:#b7c8ff; font-weight:600; }}
+    .talent-value {{ color:#ffffff; text-align:right; }}
+    @media (max-width: 1100px) {{ .talent-grid {{ grid-template-columns: 1fr; }} }}
     </style></head><body>
 
-    <div class="profile-header">
-        <div class="profile-info">
+    <div class='talent-profile-shell'>
+    <div class="talent-header">
+        <div>
             <h2>{emp['employee_name']}</h2>
             <div>Employee ID: <b>{emp['employee_id']}</b></div>
             <div>{emp['function']} | {emp['department']} | Band: {emp['band']} | Grade: {emp['grade']}</div>
             <div>Age: {age} | Tenure: {tenure}</div>
         </div>
-        {f"<img src='{photo_b64}' class='photo'/>" if photo_b64 else ''}
+        {f"<img src='{photo_b64}' class='talent-avatar'/>" if photo_b64 else ''}
     </div>
     """
 
-    html += "<div class='gridbox'>" + section("Organizational Context", [
+    html += "<div class='talent-grid'>" + section("Organizational Context", [
         ("Company", "company"), ("Business Unit", "business_unit"),
         ("Department", "department"), ("Function", "function"),
         ("Zone", "zone"), ("Cluster", "cluster"), ("Area", "area"), ("Location", "location")
@@ -209,26 +188,25 @@ def render(data_frames):
         ("Previous Experience", "prev_exp_in_yrs"), ("Employment Type", "employment_type")
     ]) + "</div>"
 
-    html += "<div class='gridbox'>" + section("Compensation", [
-        ("Fixed CTC", "fixed_ctc_pa"), ("Variable CTC", "variable_ctc_pa"),
-        ("Total CTC", "total_ctc_pa")
+    html += "<div class='talent-grid'>" + section("Compensation", [
+        ("Fixed CTC", "fixed_ctc_pa"), ("Variable CTC", "variable_ctc_pa"), ("Total CTC", "total_ctc_pa")
     ]) + section("Performance & Potential", [
         ("Satisfaction Score", "satisfaction_score"), ("Engagement Score", "engagement_score"),
         ("Rating 2025", "rating_25"), ("Rating 2024", "rating_24"),
         ("Top Talent", "Top Talent"), ("Succession Ready", "succession_ready")
     ]) + "</div>"
 
-    html += "<div class='gridbox'>" + section("Development & Learning", [
+    html += "<div class='talent-grid'>" + section("Development & Learning", [
         ("Learning Program", "learning_program"), ("Training Hours", "training_hours")
     ]) + section("Competency & Skills", [
         ("Competency", "competency"), ("Competency Details", "merged_competency"), ("Skills", "merged_skills")
     ]) + "</div>"
 
-    html += "<div class='gridbox'>" + section("Education & Background", [
+    html += "<div class='talent-grid'>" + section("Education & Background", [
         ("Qualification", "qualification"), ("Highest Qualification", "highest_qualification"),
         ("Qualification Type", "qualification_type"), ("Previous Employers", "previous_employers"),
         ("Last Employer", "last_employer"), ("Employment Sector", "employment_sector")
-    ]) + "</div></body></html>"
+    ]) + "</div></div></body></html>"
 
     st.components.v1.html(html, height=1000, scrolling=True)
 
@@ -239,7 +217,6 @@ def render(data_frames):
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html)
 
-    # Only try PDF export and show download if not on cloud
     if not is_cloud():
         pdf_success = export_html_to_pdf_using_cdp(html_path, pdf_path)
         if pdf_success:
