@@ -1,14 +1,17 @@
 import plotly.io as pio
 
-BRAND_TEMPLATE_NAME = "worklense_dark"
+BRAND_TEMPLATE_NAME = "worklense_professional"
 BRAND_COLORWAY = [
-    "#6d4dff",
-    "#15d4ff",
-    "#ff3cac",
-    "#8bf3ff",
-    "#9e84ff",
-    "#ffc14d",
-    "#56f2b5",
+    "#4E79A7",
+    "#F28E2B",
+    "#E15759",
+    "#76B7B2",
+    "#59A14F",
+    "#EDC948",
+    "#B07AA1",
+    "#FF9DA7",
+    "#9C755F",
+    "#BAB0AC",
 ]
 
 
@@ -16,26 +19,31 @@ def register_brand_template() -> None:
     pio.templates[BRAND_TEMPLATE_NAME] = {
         "layout": {
             "paper_bgcolor": "rgba(0,0,0,0)",
-            "plot_bgcolor": "rgba(0,0,0,0)",
-            "font": {"family": "Inter, sans-serif", "color": "#f4f7ff", "size": 13},
+            "plot_bgcolor": "#ffffff",
+            "font": {"family": "Inter, sans-serif", "color": "#21344d", "size": 13},
             "colorway": BRAND_COLORWAY,
             "legend": {
-                "bgcolor": "rgba(9,14,30,0.72)",
-                "bordercolor": "rgba(255,255,255,0.16)",
+                "bgcolor": "rgba(255,255,255,0.82)",
+                "bordercolor": "#d7e0ee",
                 "borderwidth": 1,
-                "font": {"color": "#d9e7ff"},
+                "font": {"color": "#31445e"},
             },
             "xaxis": {
-                "gridcolor": "rgba(255,255,255,0.10)",
-                "linecolor": "rgba(255,255,255,0.25)",
-                "zerolinecolor": "rgba(255,255,255,0.16)",
+                "gridcolor": "#e9eff7",
+                "linecolor": "#ccd7e6",
+                "zerolinecolor": "#dbe4f0",
+                "tickfont": {"color": "#4d6281"},
+                "title": {"font": {"color": "#425672"}},
             },
             "yaxis": {
-                "gridcolor": "rgba(255,255,255,0.10)",
-                "linecolor": "rgba(255,255,255,0.25)",
-                "zerolinecolor": "rgba(255,255,255,0.16)",
+                "gridcolor": "#e9eff7",
+                "linecolor": "#ccd7e6",
+                "zerolinecolor": "#dbe4f0",
+                "tickfont": {"color": "#4d6281"},
+                "title": {"font": {"color": "#425672"}},
             },
-            "title": {"font": {"color": "#f8faff", "size": 17}},
+            "title": {"font": {"color": "#223a5e", "size": 18}},
+            "margin": {"l": 56, "r": 24, "t": 52, "b": 48},
         }
     }
 
