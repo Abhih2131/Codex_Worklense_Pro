@@ -4,19 +4,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 from theme_handler import selected_theme
 from utils.formatting import format_in_indian_style
+from utils.ui_components import inject_report_stylesheet, render_kpi, render_page_title
 
-# === Load Report Style ===
-with open("utils/report_style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-# === KPI Card Formatter ===
-def kpi(label, value):
-    return f"""
-    <div class="kpi-card">
-        <div class="kpi-value">{value}</div>
-        <div class="kpi-label">{label}</div>
-    </div>
-    """
+inject_report_stylesheet()
 
 def render(data_frames):
     selected_theme()
@@ -49,18 +39,18 @@ def render(data_frames):
     training_hours = int(df_active["training_hours"].fillna(0).sum())
     satisfaction_score = round(df_active["satisfaction_score"].fillna(0).mean(), 1)
 
-    st.markdown("<h2 style='text-align: left;'>People: Snapshot</h2>", unsafe_allow_html=True)
+    render_page_title("People Snapshot", "Workforce composition, growth, cost, and demographic movement overview.")
     col1, col2, col3, col4 = st.columns(4)
-    with col1: st.markdown(kpi("Total Employees", f"{total_employees:,}"), unsafe_allow_html=True)
-    with col2: st.markdown(kpi("New Hires (FY)", f"{new_hires:,}"), unsafe_allow_html=True)
-    with col3: st.markdown(kpi("Total Exits (FY)", f"{total_exits:,}"), unsafe_allow_html=True)
-    with col4: st.markdown(kpi("Average Age", f"{avg_age} Yrs"), unsafe_allow_html=True)
+    with col1: st.markdown(render_kpi("Total Employees", f"{total_employees:,}"), unsafe_allow_html=True)
+    with col2: st.markdown(render_kpi("New Hires (FY)", f"{new_hires:,}"), unsafe_allow_html=True)
+    with col3: st.markdown(render_kpi("Total Exits (FY)", f"{total_exits:,}"), unsafe_allow_html=True)
+    with col4: st.markdown(render_kpi("Average Age", f"{avg_age} Yrs"), unsafe_allow_html=True)
 
     col5, col6, col7, col8 = st.columns(4)
-    with col5: st.markdown(kpi("Average Tenure", f"{avg_tenure} Yrs"), unsafe_allow_html=True)
-    with col6: st.markdown(kpi("Average Experience", f"{avg_exp} Yrs"), unsafe_allow_html=True)
-    with col7: st.markdown(kpi("Training Hours", f"{training_hours:,}"), unsafe_allow_html=True)
-    with col8: st.markdown(kpi("Avg Satisfaction Score", f"{satisfaction_score}"), unsafe_allow_html=True)
+    with col5: st.markdown(render_kpi("Average Tenure", f"{avg_tenure} Yrs"), unsafe_allow_html=True)
+    with col6: st.markdown(render_kpi("Average Experience", f"{avg_exp} Yrs"), unsafe_allow_html=True)
+    with col7: st.markdown(render_kpi("Training Hours", f"{training_hours:,}"), unsafe_allow_html=True)
+    with col8: st.markdown(render_kpi("Avg Satisfaction Score", f"{satisfaction_score}"), unsafe_allow_html=True)
 
     # === Charts Data ===
     headcount, cost_data, attr_data = [], [], []

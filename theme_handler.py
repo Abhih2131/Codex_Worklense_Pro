@@ -1,11 +1,10 @@
-# theme_handler.py
 import streamlit as st
-import plotly.io as pio
 
-# Centralized Theme Settings
-THEME_OPTIONS = ["plotly_white", "simple_white", "presentation", "seaborn", "ggplot2"]
+from utils.chart_style import use_brand_template
 
-def selected_theme():
-    theme = st.sidebar.selectbox("🎨 Select Chart Theme", THEME_OPTIONS)
-    pio.templates.default = theme
-    return theme
+
+def selected_theme() -> str:
+    """Apply a single brand-aligned chart template everywhere."""
+    use_brand_template()
+    st.sidebar.caption("🎨 Chart style: Worklense Dark (brand default)")
+    return "worklense_dark"

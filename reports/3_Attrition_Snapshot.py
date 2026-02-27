@@ -8,18 +8,9 @@ import base64
 from io import BytesIO
 from theme_handler import selected_theme
 from utils.formatting import format_in_indian_style
+from utils.ui_components import inject_report_stylesheet, render_kpi, render_page_title
 
-# === Load Report Style ===
-with open("utils/report_style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-def kpi(label, value):
-    return f"""
-    <div class="kpi-card">
-        <div class="kpi-value">{value}</div>
-        <div class="kpi-label">{label}</div>
-    </div>
-    """
+inject_report_stylesheet()
 
 def render(data_frames):
     selected_theme()
@@ -31,7 +22,7 @@ def render(data_frames):
     df["date_of_joining"] = pd.to_datetime(df["date_of_joining"], errors="coerce")
     df["date_of_exit"] = pd.to_datetime(df["date_of_exit"], errors="coerce")
 
-    st.markdown("<h2 style='text-align: left;'>Attrition Snapshot</h2>", unsafe_allow_html=True)
+    render_page_title("Attrition Snapshot", "Who is leaving, why they leave, and what capability is at risk.")
 
     df_exits = df[
         (df["date_of_exit"] >= pd.to_datetime("2025-04-01")) &
@@ -64,16 +55,16 @@ def render(data_frames):
     top_talent_attrition_pct = df_exits[df_exits["top_talent"].str.lower() == "yes"].shape[0] / avg_hc * 100
 
     col1, col2, col3, col4 = st.columns(4)
-    with col1: st.markdown(kpi("Total Attrition % (FY)", f"{attrition_pct:.1f}%"), unsafe_allow_html=True)
-    with col2: st.markdown(kpi("Regrettable Attrition %", f"{regrettable_pct:.1f}%"), unsafe_allow_html=True)
-    with col3: st.markdown(kpi("Non-Regret Attrition %", f"{non_regrettable_pct:.1f}%"), unsafe_allow_html=True)
-    with col4: st.markdown(kpi("Retirement Attrition %", f"{retirement_pct:.1f}%"), unsafe_allow_html=True)
+    with col1: st.markdown(render_kpi("Total Attrition % (FY)", f"{attrition_pct:.1f}%"), unsafe_allow_html=True)
+    with col2: st.markdown(render_kpi("Regrettable Attrition %", f"{regrettable_pct:.1f}%"), unsafe_allow_html=True)
+    with col3: st.markdown(render_kpi("Non-Regret Attrition %", f"{non_regrettable_pct:.1f}%"), unsafe_allow_html=True)
+    with col4: st.markdown(render_kpi("Retirement Attrition %", f"{retirement_pct:.1f}%"), unsafe_allow_html=True)
 
     col5, col6, col7, col8 = st.columns(4)
-    with col5: st.markdown(kpi("Avg Tenure of Exited", f"{avg_tenure_exited:.1f} yrs"), unsafe_allow_html=True)
-    with col6: st.markdown(kpi("Top Exit Region", top_exit_region), unsafe_allow_html=True)
-    with col7: st.markdown(kpi("High Perf. Attrition %", f"{high_perf_attrition_pct:.1f}%"), unsafe_allow_html=True)
-    with col8: st.markdown(kpi("Top Talent Attrition %", f"{top_talent_attrition_pct:.1f}%"), unsafe_allow_html=True)
+    with col5: st.markdown(render_kpi("Avg Tenure of Exited", f"{avg_tenure_exited:.1f} yrs"), unsafe_allow_html=True)
+    with col6: st.markdown(render_kpi("Top Exit Region", top_exit_region), unsafe_allow_html=True)
+    with col7: st.markdown(render_kpi("High Perf. Attrition %", f"{high_perf_attrition_pct:.1f}%"), unsafe_allow_html=True)
+    with col8: st.markdown(render_kpi("Top Talent Attrition %", f"{top_talent_attrition_pct:.1f}%"), unsafe_allow_html=True)
 
     # Chart logic reused
     df_exits["exit_tenure"] = (
@@ -152,16 +143,30 @@ def render(data_frames):
     with col7:
         st.markdown("### 🧠 Skill Loss")
         skill_text = " ".join(df_exits[["skills_1", "skills_2", "skills_3"]].astype(str).stack().dropna().str.lower().tolist())
-        wc1 = WordCloud(width=800, height=400, background_color="white").generate(skill_text)
-        buf1 = BytesIO(); plt.figure(figsize=(6,3)); plt.imshow(wc1); plt.axis("off"); plt.tight_layout(); plt.savefig(buf1, format="png"); buf1.seek(0)
+        wc1 = WordCloud(width=800, height=400, background_color=None, mode="RGBA", colormap="cool").generate(skill_text)
+        buf1 = BytesIO()
+        plt.figure(figsize=(6, 3), facecolor="none")
+        plt.imshow(wc1)
+        plt.axis("off")
+        plt.tight_layout()
+        plt.gca().set_facecolor("none")
+        plt.savefig(buf1, format="png", transparent=True)
+        buf1.seek(0)
         img1 = base64.b64encode(buf1.read()).decode("utf-8")
         st.markdown(f'<img src="data:image/png;base64,{img1}" width="100%">', unsafe_allow_html=True)
 
     with col8:
         st.markdown("### 🧭 Competency Loss")
         comp_text = " ".join(df_exits["competency"].dropna().astype(str).str.lower().tolist())
-        wc2 = WordCloud(width=800, height=400, background_color="white").generate(comp_text)
-        buf2 = BytesIO(); plt.figure(figsize=(6,3)); plt.imshow(wc2); plt.axis("off"); plt.tight_layout(); plt.savefig(buf2, format="png"); buf2.seek(0)
+        wc2 = WordCloud(width=800, height=400, background_color=None, mode="RGBA", colormap="cool").generate(comp_text)
+        buf2 = BytesIO()
+        plt.figure(figsize=(6, 3), facecolor="none")
+        plt.imshow(wc2)
+        plt.axis("off")
+        plt.tight_layout()
+        plt.gca().set_facecolor("none")
+        plt.savefig(buf2, format="png", transparent=True)
+        buf2.seek(0)
         img2 = base64.b64encode(buf2.read()).decode("utf-8")
         st.markdown(f'<img src="data:image/png;base64,{img2}" width="100%">', unsafe_allow_html=True)
 
